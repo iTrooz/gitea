@@ -112,16 +112,21 @@ loop:
 		entry := new(TreeEntry)
 		entry.ptree = ptree
 
-		switch string(mode) {
-		case "100644":
+		intMode, err := strconv.ParseInt(string(mode), 10, 64)
+		if err != nil {
+			return nil, err
+		}
+
+		switch intMode {
+		case 100644:
 			entry.entryMode = EntryModeBlob
-		case "100755":
+		case 100755:
 			entry.entryMode = EntryModeExec
-		case "120000":
+		case 120000:
 			entry.entryMode = EntryModeSymlink
-		case "160000":
+		case 160000:
 			entry.entryMode = EntryModeCommit
-		case "40000", "40755": // git uses 40000 for tree object, but some users may get 40755 for unknown reasons
+		case 40000, 40755: // git uses 40000 for tree object, but some users may get 40755 for unknown reasons
 			entry.entryMode = EntryModeTree
 		default:
 			log.Debug("Unknown mode: %v", string(mode))
